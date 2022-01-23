@@ -8,17 +8,42 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+    <h2>This section is to see the remaining possible words based on the result of your claim.</h2>
+
+    <span>Enter claim:</span><button id='findTruthRandomClaim'>Random claim</button><br>
+    <input type='text' id='claimInputResult'><br>
+    <h4>For the result, enter "G" for a green box, "Y" for yellow, "B" for black based on actual result of claim. 
+        <br>Example: BGBYB
+        <br>Include no spaces or other characters.
+    </h4>
+    <span>Enter Result:</span><br>
+    <input type='text' id='resultInputResult'><br>
+    <button id='calculateResults'>Calculate possibilities</button><br><br>
+    
+    <h4>Claims:</h4>
+    <span id='claimSpan'></span>
+    <h4>Possibilities (if less than 20):</h4>
+    <span>Possibilities left: </span><span id='possibilitySpan'></span>
+    <div id='possibilityBox'>
+        
+    </div><br>
+    <button id='resetFindTruth'>Reset this section</button>
+
     <hr>
+
     <h2>This section is to manually test guesses against the true word you choose.</h2>
     <div id='inputBox'>
         
         <span>Enter truth:</span><button id='randomTruth'>Random truth</button><br>
         <input type='text' id='truthInput'><br>
+        <h4>Keep the truth the same and make as many claims as you like.</h4>
         <span>Enter claim:</span><button id='randomClaim'>Random claim</button><br>
         <input type='text' id='claimInput'><br>
         <button id='getWordleButton'>Make claim</button><br><br>
         <p id='bestGuess'></p>
     </div>
+    <h4>Claims:</h4>
+    <span id='truthClaimSpan'></span>
     <h4>Outputs:</h4>
     <div id='outputBox'>
     </div>
@@ -26,8 +51,9 @@
     <h4>Possible answers (if less than 20):</h4>
     <div id='answersBox'>
         
-    </div>
-
+    </div><br>
+    <button id='resetPickTruth'>Reset this section</button>
+    <hr>
     <h1>Original answer pool (2315)</h1>
     <div id='possibleAnswers'>
         ['aback',

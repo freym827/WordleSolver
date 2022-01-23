@@ -4,8 +4,36 @@ import {guessarray} from './wordleguesses.js'
 var guesses = [...guessarray]
 var answers = [...answerarray]
 
+var pickTruthGuesses = [...guessarray]
+var pickTruthAnswers = [...answerarray]
+
+var findTruthGuesses = [...guessarray]
+var findTruthAnswers = [...answerarray]
+
 var greens = ['G','G','G','G','G']
 var outputBox = document.getElementById('outputBox')
+
+document.getElementById('calculateResults').addEventListener('click', ()=>{
+    var claim = document.getElementById('claimInputResult').value.toLowerCase()
+    var result = document.getElementById('resultInputResult').value.toUpperCase()
+    if(!guesses.includes(claim)) {
+        alert('Claim not contained in answer list. Pick a new claim')
+        return
+    }
+    if(result.length != 5) {
+        alert('Invalid result. Enter different result')
+        return
+    }
+    document.getElementById('claimSpan').innerHTML += claim + ': ' + result + ', '
+
+    var resultObject = getResultObject(claim, result)
+    
+    findTruthAnswers = removeAnswers(findTruthAnswers, resultObject)
+    document.getElementById('possibilitySpan').innerHTML = findTruthAnswers.length
+    if(findTruthAnswers.length < 20) {
+        document.getElementById('possibilityBox').innerHTML = findTruthAnswers
+    }
+})
 
 document.getElementById('getWordleButton').addEventListener('click', ()=>{
     var truth = document.getElementById('truthInput').value.toLowerCase()
@@ -18,6 +46,7 @@ document.getElementById('getWordleButton').addEventListener('click', ()=>{
         alert('Claim not contained in answer list. Pick a new claim')
         return
     }
+    document.getElementById('truthClaimSpan').innerHTML += claim + ', '
     getWordle(truth, claim)
 })
 
@@ -33,19 +62,44 @@ document.getElementById('randomClaim').addEventListener('click', ()=>{
     document.getElementById('claimInput').value = guesses[randomIndex]
 })
 
+document.getElementById('findTruthRandomClaim').addEventListener('click', ()=>{
+    let randomIndex = Math.floor(Math.random() * guesses.length)
+
+    document.getElementById('claimInputResult').value = guesses[randomIndex]
+})
+
+document.getElementById('resetPickTruth').addEventListener('click', ()=>{
+    document.getElementById('truthInput').value = ''
+    document.getElementById('claimInput').value = ''
+    outputBox.innerHTML = ''
+    document.getElementById('answersBox').innerHTML = ''
+    document.getElementById('truthClaimSpan').innerHTML  = ''
+    pickTruthGuesses = [...guessarray]
+    pickTruthAnswers = [...answerarray]
+})
+
+document.getElementById('resetFindTruth').addEventListener('click', ()=>{
+    document.getElementById('resultInputResult').value = ''
+    document.getElementById('claimInputResult').value = ''
+    document.getElementById('possibilityBox').innerHTML = ''
+    document.getElementById('claimSpan').innerHTML = ''
+    document.getElementById('possibilitySpan').innerHTML = ''
+    findTruthGuesses = [...guessarray]
+    findTruthAnswers = [...answerarray]
+})
+
 var getWordle = (truth, claim) => {
     let currentResult = getCurrentResult(truth, claim)
 
+    pickTruthAnswers = removeAnswers(pickTruthAnswers, currentResult)
+    outputBox.innerHTML += (JSON.stringify(currentResult.currentResult) + ' Possible answers remaining: ' + pickTruthAnswers.length + '<br>')
+
+    if(pickTruthAnswers.length < 20) {
+        document.getElementById('answersBox').innerHTML = pickTruthAnswers
+    }
     if(JSON.stringify(currentResult.currentResult) == JSON.stringify(greens)) {
         outputBox.innerHTML += 'Wordle Solved'
         return
-    }
-
-    removeAnswers(currentResult)
-    outputBox.innerHTML += (JSON.stringify(currentResult.currentResult) + ' Possible answers remaining: ' + answers.length + '<br>')
-
-    if(answers.length < 20) {
-        document.getElementById('answersBox').innerHTML = answers
     }
     return currentResult
 }
@@ -97,9 +151,8 @@ var getYellows = currentResult => {
     return currentResult
 }
 
-var removeAnswers = currentResult => {
-
-    let tempAnswers = [...answers]
+var removeAnswers = (ans, currentResult) => {
+    let tempAnswers = [...ans]
     for(let i=0;i<currentResult.currentResult.length;i++) {
         if(currentResult.currentResult[i] == 'B') {
             let dupeFlag = false
@@ -115,40 +168,41 @@ var removeAnswers = currentResult => {
             if(dupeFlag) {
                 continue
             }
-            for(let j=0;j<answers.length;j++) {
-                if(answers[j].includes(currentResult.claim[i])) {
-                    if(tempAnswers.indexOf(answers[j]) != -1) {
-                        tempAnswers.splice(tempAnswers.indexOf(answers[j]), 1)
+            for(let j=0;j<ans.length;j++) {
+                if(ans[j].includes(currentResult.claim[i])) {
+                    if(tempAnswers.indexOf(ans[j]) != -1) {
+                        tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
                     }
                 }
             }
-            answers = [...tempAnswers]
+            ans = [...tempAnswers]
             continue
         }
         
         if(currentResult.currentResult[i] == 'Y') {
-            for(let j=0;j<answers.length;j++) {
-                if(!answers[j].includes(currentResult.claim[i])) {
-                    if(tempAnswers.indexOf(answers[j]) != -1) {
-                        tempAnswers.splice(tempAnswers.indexOf(answers[j]), 1)
+            for(let j=0;j<ans.length;j++) {
+                if(!ans[j].includes(currentResult.claim[i])) {
+                    if(tempAnswers.indexOf(ans[j]) != -1) {
+                        tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
                     }
                 }
             }
-            answers = [...tempAnswers]
+            ans = [...tempAnswers]
             continue
         }
         if(currentResult.currentResult[i] == 'G') {
-            for(let j=0;j<answers.length;j++) {
-                if(answers[j][i] != currentResult.claim[i]) {
-                    if(tempAnswers.indexOf(answers[j]) != -1) {
-                        tempAnswers.splice(tempAnswers.indexOf(answers[j]), 1)
+            for(let j=0;j<ans.length;j++) {
+                if(ans[j][i] != currentResult.claim[i]) {
+                    if(tempAnswers.indexOf(ans[j]) != -1) {
+                        tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
                     }
                 }
             }
-            answers = [...tempAnswers]
+            ans = [...tempAnswers]
             continue
         }
     }
+    return ans
 }
 
 var countLetters = (letter, word) => {
@@ -167,4 +221,26 @@ var getOneResult = (answer, guess) => {
         let currentResult = getWordle(answer, guess)
         let pair = [guess, answers.length]
         console.log(pair)
+}
+
+var getResultObject = (claim, result) => {
+
+    let resultArray = []
+    for(let i=0;i<result.length;i++) {
+        resultArray.push(result[i])
+    }
+
+    let resultObject = {
+        truth: null,
+        tempTruth: null,
+        claim: claim,
+        currentResult: resultArray,
+        currentResultCounts: [0,0,0,0,0]
+    }
+
+    for(let i=0;i<5;i++) {
+        resultObject.currentResultCounts[i] = countLetters(claim[i], claim)
+    }
+
+    return resultObject
 }
