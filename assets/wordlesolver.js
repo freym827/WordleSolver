@@ -27,6 +27,12 @@ document.getElementById('randomTruth').addEventListener('click', ()=>{
     document.getElementById('truthInput').value = answers[randomIndex]
 })
 
+document.getElementById('randomClaim').addEventListener('click', ()=>{
+    let randomIndex = Math.floor(Math.random() * guesses.length)
+
+    document.getElementById('claimInput').value = guesses[randomIndex]
+})
+
 var getWordle = (truth, claim) => {
     let currentResult = getCurrentResult(truth, claim)
 
