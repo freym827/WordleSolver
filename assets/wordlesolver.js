@@ -10,6 +10,18 @@ var pickTruthAnswers = [...answerarray]
 var findTruthGuesses = [...guessarray]
 var findTruthAnswers = [...answerarray]
 
+// var answers = [
+//     'allow','alloy','colon','color','dolly','folly', 'ducky','steel','lunch','lists','plumb','storm','japan','coral','beers'
+// ]
+
+// var pickTruthAnswers = [
+//     'allow','alloy','colon','color','dolly','folly', 'ducky','steel','lunch','lists','plumb','storm','japan','coral','beers'
+// ]
+
+// var findTruthAnswers = [
+//     'allow','alloy','colon','color','dolly','folly', 'ducky','steel','lunch','lists','plumb','storm','japan','coral','beers'
+// ]
+
 var greens = ['G','G','G','G','G']
 var outputBox = document.getElementById('outputBox')
 
@@ -17,18 +29,21 @@ document.getElementById('calculateResults').addEventListener('click', ()=>{
     var claim = document.getElementById('claimInputResult').value.toLowerCase()
     var result = document.getElementById('resultInputResult').value.toUpperCase()
     if(!guesses.includes(claim)) {
-        alert('Claim not contained in answer list. Pick a new claim')
+        alert('Claim not contained in guess list. Pick a new claim')
         return
     }
     if(result.length != 5) {
         alert('Invalid result. Enter different result')
         return
     }
+    document.getElementById('claimInputResult').value = ''
+    document.getElementById('resultInputResult').value = ''
     document.getElementById('claimSpan').innerHTML += claim + ': ' + result + ', '
 
     var resultObject = getResultObject(claim, result)
-    
+
     findTruthAnswers = removeAnswers(findTruthAnswers, resultObject)
+
     document.getElementById('possibilitySpan').innerHTML = findTruthAnswers.length
     if(findTruthAnswers.length < 20) {
         document.getElementById('possibilityBox').innerHTML = findTruthAnswers
@@ -114,9 +129,7 @@ var getCurrentResult = (truth, claim) => {
         currentResultCounts: [0,0,0,0,0]
     }
 
-    for(let i=0;i<5;i++) {
-        resultObject.currentResultCounts[i] = countLetters(claim[i], claim)
-    }
+    resultObject = countBlackLetters(resultObject)
 
     let currentResult = getGreens(resultObject)
     currentResult = getYellows(currentResult)
@@ -155,33 +168,51 @@ var removeAnswers = (ans, currentResult) => {
     let tempAnswers = [...ans]
     for(let i=0;i<currentResult.currentResult.length;i++) {
         if(currentResult.currentResult[i] == 'B') {
-            let dupeFlag = false
-            if(currentResult.currentResultCounts[i] != 1) {
-                for(let k=0;k<currentResult.currentResult.length;k++) {
-                    if(currentResult.currentResult[k] == 'G' || currentResult.currentResult[k] == 'Y') {
-                        if(currentResult.claim[k] == currentResult.claim[i]) {
-                            dupeFlag = true
-                        }
-                    }
-                }
-            }
-            if(dupeFlag) {
-                continue
-            }
             for(let j=0;j<ans.length;j++) {
-                if(ans[j].includes(currentResult.claim[i])) {
-                    if(tempAnswers.indexOf(ans[j]) != -1) {
-                        tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
-                    }
+                let answerLetterCount = countLetters(currentResult.claim[i], ans[j])
+                if(answerLetterCount >= currentResult.currentResultCounts[i]) {
+                     if(tempAnswers.indexOf(ans[j]) != -1) {
+                         tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
+                     }
                 }
             }
             ans = [...tempAnswers]
             continue
         }
+
+        // if(currentResult.currentResult[i] == 'B') {
+        //     let dupeFlag = false
+        //     if(currentResult.currentResultCounts[i] != 1) {
+        //         for(let k=0;k<currentResult.currentResult.length;k++) {
+        //             if(currentResult.currentResult[k] == 'G' || currentResult.currentResult[k] == 'Y') {
+        //                 if(currentResult.claim[k] == currentResult.claim[i]) {
+        //                     dupeFlag = true
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     if(dupeFlag) {
+        //         continue
+        //     }
+        //     for(let j=0;j<ans.length;j++) {
+        //         if(ans[j].includes(currentResult.claim[i])) {
+        //             if(tempAnswers.indexOf(ans[j]) != -1) {
+        //                 tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
+        //             }
+        //         }
+        //     }
+        //     ans = [...tempAnswers]
+        //     continue
+        // }
         
         if(currentResult.currentResult[i] == 'Y') {
             for(let j=0;j<ans.length;j++) {
                 if(!ans[j].includes(currentResult.claim[i])) {
+                    if(tempAnswers.indexOf(ans[j]) != -1) {
+                        tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
+                    }
+                }
+                if(ans[j][i] == currentResult.claim[i]) {
                     if(tempAnswers.indexOf(ans[j]) != -1) {
                         tempAnswers.splice(tempAnswers.indexOf(ans[j]), 1)
                     }
@@ -238,9 +269,21 @@ var getResultObject = (claim, result) => {
         currentResultCounts: [0,0,0,0,0]
     }
 
-    for(let i=0;i<5;i++) {
-        resultObject.currentResultCounts[i] = countLetters(claim[i], claim)
-    }
+    resultObject = countBlackLetters(resultObject)
 
     return resultObject
 }
+
+var countBlackLetters = (resultObject) => {
+    for(let i=0;i<resultObject.claim.length;i++) {
+        let count = 0
+        for(let j=0;j<resultObject.claim.length;j++) {
+            if(resultObject.claim[i] == resultObject.claim[j]) {
+                count++
+            }
+        }
+        resultObject.currentResultCounts[i] = count
+    }
+    return resultObject
+}
+
