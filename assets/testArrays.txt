@@ -1,0 +1,9 @@
+var guesses = 
+[
+    'RATES', 'ROUTE', 'LINGO', 'LUNCH', 'LISTS', 'DUCHY', 'DUCKY', 'PLUMB', 'STORM', 'JAPAN', 'STEEL', 'CORAL', 'BEERS', 'TEETH', 'ZEBRA', 'ZETAS', 'GOOSE', 'FATES', 'ROARS'
+]
+
+var answers = 
+[
+    'RATES', 'ROUTE', 'LINGO', 'LUNCH', 'LISTS', 'DUCHY', 'DUCKY', 'PLUMB', 'STORM', 'JAPAN', 'STEEL', 'CORAL', 'BEERS', 'TEETH', 'ZEBRA', 'ZETAS', 'GOOSE', 'FATES', 'ROARS'
+]

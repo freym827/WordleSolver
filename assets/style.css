@@ -1,0 +1,14 @@
+#outputBox {
+    width: 100%;
+    min-height: 20px;
+}
+
+#possibleGuesses {
+    width: 100vw;
+    min-height: 20px;
+}
+
+#possibleAnswers {
+    width: 100vw;
+    min-height: 20px;
+}
