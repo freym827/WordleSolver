@@ -10,6 +10,12 @@ var pickTruthAnswers = [...answerarray]
 var findTruthGuesses = [...guessarray]
 var findTruthAnswers = [...answerarray]
 
+// const points = [['b', 32], ['c', 21], ['a', 45], ['d', 33], ['e', 99]]
+
+// points.sort(function(a, b){return a[1] - b[1]})
+
+// console.log(points)
+
 // var answers = [
 //     'allow','alloy','colon','color','dolly','folly', 'ducky','steel','lunch','lists','plumb','storm','japan','coral','beers'
 // ]
@@ -50,6 +56,15 @@ document.getElementById('calculateResults').addEventListener('click', ()=>{
     }
 })
 
+document.getElementById('bestGuessButton').addEventListener('click', ()=>{
+    //getBestGuess(findTruthAnswers)
+    if(findTruthAnswers.length == 2315) {
+        document.getElementById('claimInputResult').value = 'alive'
+        return
+    }
+    getVeryGoodGuess()
+})
+
 document.getElementById('getWordleButton').addEventListener('click', ()=>{
     var truth = document.getElementById('truthInput').value.toLowerCase()
     var claim = document.getElementById('claimInput').value.toLowerCase()
@@ -58,7 +73,7 @@ document.getElementById('getWordleButton').addEventListener('click', ()=>{
         return
     }
     if(!guesses.includes(claim)) {
-        alert('Claim not contained in answer list. Pick a new claim')
+        alert('Claim not contained in guess list. Pick a new claim')
         return
     }
     document.getElementById('truthClaimSpan').innerHTML += claim + ', '
@@ -160,7 +175,6 @@ var getYellows = currentResult => {
             }
         }
     }
-
     return currentResult
 }
 
@@ -286,4 +300,82 @@ var countBlackLetters = (resultObject) => {
     }
     return resultObject
 }
+
+var getBestGuess = (answerList) => {
+    
+    let bestGuessAnswers = [...answerList]
+    let answerArray = []
+    let guessesAverages = []
+    let tempBestAnswers
+
+    for(let i=0;i<findTruthGuesses.length;i++) {
+        for(let j=0;j<10;j++) {
+            tempBestAnswers = [...bestGuessAnswers]
+            let currentResult = getCurrentResult(tempBestAnswers[j], findTruthGuesses[i])
+            tempBestAnswers = removeAnswers(tempBestAnswers, currentResult)
+            answerArray.push(tempBestAnswers.length)
+        }
+        let average = averageArray(answerArray)
+        guessesAverages.push([findTruthGuesses[i], average])
+    }
+
+    guessesAverages.sort(function(a, b){return a[1] - b[1]})
+
+    console.log(guessesAverages)
+}
+
+var getVeryGoodGuess = () => {
+    
+    let bestGuessAnswers = [...findTruthAnswers]
+    let answerArray = []
+    let guessesAverages = []
+    let tempBestAnswers
+
+    for(let i=0;i<bestGuessAnswers.length;i++) {
+        for(let j=0;j<bestGuessAnswers.length;j++) {
+            let goodGuessObject = getGoodGeussObject(bestGuessAnswers[j], bestGuessAnswers[i])
+            goodGuessObject = getGreens(goodGuessObject)
+            goodGuessObject = getYellows(goodGuessObject)
+            let gycount = countGY(goodGuessObject.currentResult)
+            answerArray.push(gycount)
+        }
+        let average = averageArray(answerArray)
+        guessesAverages.push([bestGuessAnswers[i], average])
+    }
+    guessesAverages.sort(function(a, b){return b[1] - a[1]})
+    document.getElementById('claimInputResult').value = guessesAverages[0][0]
+}
+
+const averageArray = (array) => array.reduce((a, b) => a + b) / array.length;
+
+var getGoodGeussObject = (truth, claim) => {
+
+    let resultObject = {
+        truth: truth,
+        tempTruth: truth,
+        claim: claim,
+        currentResult: ['B', 'B', 'B', 'B', 'B'],
+    }
+
+    let currentResult = getGreens(resultObject)
+    currentResult = getYellows(currentResult)
+
+    return currentResult
+}
+
+var countGY = currentResult => {
+    let count = 0
+    for(let i=0;i<currentResult.length;i++) {
+        if(currentResult[i] == 'G') {
+            count += 2
+            continue
+        }
+        if(currentResult[i] == 'Y') {
+            count += 1
+        }
+    }
+    return count
+}
+
+
 
